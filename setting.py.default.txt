@@ -1,0 +1,119 @@
+
+TOKEN = ' '
+GROUP_ID = ' '
+
+INTENTS = [
+    {
+        "name": "Помощь",
+        "tokens": ("/help", 'помощь', 'привет', 'ку', 'hi', 'hello', 'здравствуй',
+                   'салют', 'добрый день', 'добрый вечер', 'доброе утро', 'помоги', 'подскажи'),
+        "scenario": None,
+        "answer": "Здравствуйте!"
+                  "\nЭто чат-бот для поиска самых дешевых авиабилетов!"
+                  "\nБот отдает список рейсов по городу отправления,"
+                  "городу назначения и заданной дате,"
+                  "выдает 5 рейсов, ближайших к заданной дате."
+                  "\nДля создания билета введите команду /ticket"
+    },
+    {
+        "name": "Купить билет",
+        "tokens": ("/ticket", 'билет'),
+        "scenario": "ticket",
+        "answer": None
+    },
+
+]
+
+SCENARIOS = {
+    "ticket": {
+        "first_step": "step1",
+        "steps": {
+            "step1": {
+                "text": 'Введите город отправления(один город)',
+                "failure_text": 'Не могу разобрать, откуда вы летите,'
+                                'или из этого города нет полетов.'
+                                '\nПопробуйте снова.',
+                "handler": "handle_departure",
+                "next_step": "step2"
+            },
+            "step2": {
+                "text": 'Введите город прибытия.',
+                "failure_text": 'К сожалению, между выбранными городами нет авиасообщения.'
+                                '\nВыберите из имеющихся: '
+                                '\n-{cities}',
+                "handler": "handle_arrival",
+                "next_step": "step3"
+            },
+            "step3": {
+                "text": 'Введите дату отправления в формате "dd-mm-yyyy".'
+                        '\nРаспиасние полетов есть только на 4 ближайших месяца.',
+                "failure_text": 'Вы выбрали несуществующую дату.'
+                                '\nПопробуйте снова.',
+                "handler": "handle_date",
+                "next_step": "step4"
+            },
+            "step4": {
+                "text": 'По вашему запросу мы нашли несколько подходящих рейсов.'
+                        'Выберите подходящий для вас. '
+                        '\n{flies}',
+                "failure_text": 'Мы показали ближайшие 5 рейсов.\nПопробуйте снова.',
+                "handler": "handle_choice",
+                "next_step": "step5"
+            },
+            "step5": {
+                "text": 'Уточните количество пассажиров (1-5).',
+                "failure_text": 'Неверное количество пассажиров.\nПопробуйте снова.',
+                "handler": "handle_places",
+                "next_step": "step6"
+            },
+            "step6": {
+                "text": 'Введите комментарий (не обязательно)',
+                "failure_text": None,
+                "handler": "handle_commentary",
+                "next_step": "step7"
+            },
+            "step7": {
+                "text": 'Проверьте ваши данные и подтвердите заказ.'
+                        '\n'
+                        '\nГород отправления : {departure}'
+                        '\nГород прибытия : {arrival}'
+                        '\nДата и время : {chosen_date}'
+                        '\nКоличество мест : {places}'
+                        '\nКомментарий : {comment}'
+                        '\n'
+                        '\n Введите "Да", если все верно, "Нет", если есть ошибки в данных',
+                "failure_text": '\nПопробуйте снова.',
+                "handler": "handle_confirm",
+                "next_step": "step8"
+            },
+            "step8": {
+                "text": 'Введите номер телефона. По нему с вами свяжется оператор.',
+                "failure_text": 'Не можем распознать номер.\nПопробуйте снова.',
+                "handler": "handle_phone_number",
+                "next_step": "step9"
+            },
+            "step9": {
+                "text": 'Введите Email. Мы отправим на него все данные.',
+                "failure_text": 'Не можем распознать email.\nПопробуйте снова.',
+                "handler": "handle_email",
+                "next_step": "step10"
+            },
+            "step10": {
+                "text": 'Спасибо за заказ. Билет будет ниже во вложении.',
+                "image": 'handle_generate_ticket',
+                "failure_text": None,
+                "handler": None,
+                "next_step": None
+            },
+        }
+    }
+}
+
+DEFAULT_ANSWER = " Для информации о работе бота используйте команду /help"
+
+DB_CONFIG = dict(
+    provider='postgres',
+    user='postgres',
+    host='localhost',
+    database='vk_chatbot'
+)
